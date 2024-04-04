@@ -8,9 +8,8 @@
 输出说明：输出PI的值，精确到小数点后n位，最后输出一个回车。
 */
 
-//程序包含的头文件
+// 程序包含的头文件
 #include <stdio.h>
-
 #include <stdlib.h>
 
 //函数结果状态代码
@@ -27,9 +26,10 @@ typedef struct DuLNode {
 }
 DuLNode, * DuLinkList;
 
+// 函数声明
 void InitDuLinkList(DuLinkList * );
 void InsertAtHead(DuLinkList * , int);
-void SearchList(DuLinkList * , DuLNode ** );
+void SearchEndnode(DuLinkList * , DuLNode ** );
 void PrintList(DuLinkList * , DuLNode ** , int);
 void FreeList(DuLinkList * );
 
@@ -39,12 +39,16 @@ void Largenumber_Division(DuLinkList * , int);
 
 int main() {
 
+// 定义两个双向链表，Curterm用于存储当前项，Sum用于存储和
   DuLinkList Curterm, Sum;
   InitDuLinkList( & Curterm);
   InitDuLinkList( & Sum);
 
+// 定义两个整型变量，i用于循环，figure用于存储用户输入的位数
   int i, figure;
   scanf("%d", & figure);
+
+//将链表中的节点数据初始化为逆序的"0000001"
   InsertAtHead( & Curterm, 1);
   InsertAtHead( & Sum, 1);
 
@@ -53,6 +57,7 @@ int main() {
     InsertAtHead( & Sum, 0);
   }
 
+// 根据精确度计算PI的近似值 
   for (i = 1; i <= 6 * figure; i++) {
 
     Largenumber_Multiplication( & Curterm, i);
@@ -61,12 +66,14 @@ int main() {
 
   }
 
-  Largenumber_Addition( & Sum, & Sum);
+  Largenumber_Addition( & Sum, & Sum); 
 
+// 逆序输出Sum链表至指定位数
   DuLNode * Sum_tail;
-  SearchList( & Sum, & Sum_tail);
+  SearchEndnode( & Sum, & Sum_tail);
   PrintList( & Sum, & Sum_tail, figure);
 
+// 释放链表占用的内存并结束程序进程 
   FreeList( & Curterm);
   FreeList( & Sum);
   return OK;
@@ -107,8 +114,9 @@ void InsertAtHead(DuLinkList * L, int data) {
   ( * L) -> next = new_node;
 
 }
+
 // 查找并返回链表的尾节点
-void SearchList(DuLinkList * L, DuLNode ** p) {
+void SearchEndnode(DuLinkList * L, DuLNode ** p) {
 
   if (( * L) == NULL) exit(ERROR);
 
@@ -128,12 +136,15 @@ void PrintList(DuLinkList * L, DuLNode ** p, int i) {
 
   DuLNode * current = * p;
 
+// 将 current 向前移动至首个非零数据节点 
   while (current -> data == 0 && current -> prior != NULL) {
     current = current -> prior;
   }
 
   if (current -> data == 0) exit(ERROR);
 
+// 从当前节点开始，以小数的格式输出PI的近似值至指定位数 
+// 计数器 count 用于记录已打印节点数量
   int count = 0;
   printf("%d", current -> data);
   current = current -> prior;
@@ -185,7 +196,7 @@ void Largenumber_Addition(DuLinkList * A, DuLinkList * B) {
     pB = pB -> next;
   }
 
-  // 将未遍历完的链表（如果有）接到A链表末尾，并处理剩余节点和进位
+// 将未遍历完的链表（如果有）接到A链表末尾，并处理剩余节点和进位
   DuLinkList longer_list = (pA == NULL) ? B : A;
   DuLNode * remaining_node = (pA == NULL) ? pB : pA;
 
@@ -202,7 +213,7 @@ void Largenumber_Addition(DuLinkList * A, DuLinkList * B) {
 
   }
 
-  // 如果最后仍有进位，需在A链表末尾添加新节点存储进位值
+// 如果最后仍有进位，需在A链表末尾添加新节点存储进位值
   if (up > 0) {
 
     DuLNode * new_node = (DuLNode * ) malloc(sizeof(DuLNode));
@@ -220,13 +231,14 @@ void Largenumber_Addition(DuLinkList * A, DuLinkList * B) {
 
 }
 
-//大数乘法实现,结果放置于A链表中
+// 大数乘法实现,结果放置于A链表中
 void Largenumber_Multiplication(DuLinkList * L, int num) {
 
   if (( * L) == NULL) exit(ERROR);
 
   DuLNode * current = * L;
 
+// 首先进行每一位上的乘法运算，得到各自的乘积结果 
   while (current -> next != NULL) {
 
     current -> data = current -> data * num;
@@ -237,6 +249,7 @@ void Largenumber_Multiplication(DuLinkList * L, int num) {
   int up = 0;
   current = * L;
 
+// 自最低位起，持续进行逐位进位操作 
   while (current -> next != NULL) {
 
     current -> data += up;
@@ -245,6 +258,7 @@ void Largenumber_Multiplication(DuLinkList * L, int num) {
     current = current -> next;
   }
 
+// 如果最后仍有进位，需在L链表末尾添加新节点存储进位值
   while (up > 0) {
     DuLNode * new_node = (DuLNode * ) malloc(sizeof(DuLNode));
 
@@ -268,8 +282,9 @@ void Largenumber_Division(DuLinkList * L, int num) {
 
   if (( * L) == NULL) exit(ERROR);
 
+//从尾结点开始，将 current 向前移动至首个非零数据节点  
   DuLNode * current;
-  SearchList(L, & current);
+  SearchEndnode(L, & current);
 
   if (current == NULL) exit(ERROR);
 
@@ -281,6 +296,7 @@ void Largenumber_Division(DuLinkList * L, int num) {
 
   int temp = 0;
 
+// 模拟竖式除法运算得到结果 
   while (current -> prior != NULL) {
 
     int agency = current -> data + temp;
