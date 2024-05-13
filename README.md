@@ -12,6 +12,8 @@ This subproject is created by a NPU student learning C.
  - Data Structure
 
    - Experiment One
+   - Experiment Two
+   - Experiment Three
   
 
 ## trv3wood
